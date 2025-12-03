@@ -1,0 +1,38 @@
+name: CI - Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20]
+
+    steps:
+      - name: Run tests
+        run: npm run test:unit
+  
+  integration:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20]
+    needs: unit
+    steps:
+      - name: Run tests
+        run: npm run test:integration
+
+  e2e:
+    runs-on: ubuntu-latest
+
+    needs: integration
+    steps:
+      - name: Run tests
+        run: npm run test:e2e
