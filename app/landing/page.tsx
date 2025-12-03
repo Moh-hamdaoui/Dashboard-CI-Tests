@@ -31,15 +31,20 @@ const carouselItems = [
 
 export default function Landing() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const intervalRef = useRef<NodeJS.Timer | null>(null);
+  const intervalRef = useRef<number | null>(null);
+
 
   useEffect(() => {
-    intervalRef.current = setInterval(() => {
+    intervalRef.current = window.setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % carouselItems.length);
     }, 3000);
-    return () => clearInterval(intervalRef.current!);
-  }, []);
-
+  
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [carouselItems.length]);
   const scrollToSlide = (index: number) => {
     setCurrentSlide(index);
   };
