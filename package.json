@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
+    "test:unit": "jest tests/unit --config jest.config.js",
+    "test:integration": "jest tests/integration --config jest.config.js",
+    "test:e2e": "cypress run",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run"
   },
