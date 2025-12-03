@@ -9,30 +9,79 @@ on:
 jobs:
   unit:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [20]
-
     steps:
-      - name: Run tests
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: dashboard-next
+
+      - name: Run unit tests
         run: npm run test:unit
-  
+        working-directory: dashboard-next
+
   integration:
     runs-on: ubuntu-latest
-
+    needs: unit
     strategy:
       matrix:
         node-version: [20]
-    needs: unit
     steps:
-      - name: Run tests
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: dashboard-next
+
+      - name: Run integration tests
         run: npm run test:integration
+        working-directory: dashboard-next
 
   e2e:
     runs-on: ubuntu-latest
-
     needs: integration
+    strategy:
+      matrix:
+        node-version: [20]
     steps:
-      - name: Run tests
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: dashboard-next
+
+      - name: Build Next.js app
+        run: npm run build
+        working-directory: dashboard-next
+
+      - name: Start Next.js server
+        run: npm run start &
+        working-directory: dashboard-next
+
+      - name: Wait for server to be ready
+        run: npx wait-on http://localhost:3000/dashboard
+
+      - name: Run Cypress E2E tests
         run: npm run test:e2e
+        working-directory: dashboard-next
